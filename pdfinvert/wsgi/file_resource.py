@@ -23,7 +23,7 @@ class FileResource(object):
         filename = os.path.join(self.temp_dir, str(uuid.uuid4())) + ".pdf"
         new_filename = os.path.join(self.temp_dir, str(uuid.uuid4())) + ".pdf"
 
-        dpi = 150
+        dpi = 125
         if "HTTP_DPI" in request.headers.keys():
             dpi = int(request.headers["HTTP_DPI"])
 

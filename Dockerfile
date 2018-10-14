@@ -15,4 +15,4 @@ RUN apt update && apt install -y imagemagick
 COPY policy.xml /etc/ImageMagick-6/policy.xml
 ENV PYTHONPATH /app
 
-CMD ["/bin/bash", "-c", "gunicorn --bind=0.0.0.0:$PORT --workers=4 pdfinvert.main"]
+CMD ["/bin/bash", "-c", "gunicorn --bind=0.0.0.0:$PORT --workers=2 --threads=4 --timeout 1800 --graceful-timeout 400 pdfinvert.main"]
