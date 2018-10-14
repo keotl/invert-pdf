@@ -5,9 +5,11 @@ from jivago.config.properties.application_properties import ApplicationPropertie
 from jivago.config.startup_hooks import PostInit
 from jivago.lang.annotations import Inject
 from jivago.lang.runnable import Runnable
+from jivago.scheduling.annotations import Scheduled, Duration
 
 
 @PostInit
+@Scheduled(every=Duration.HOUR)
 class TmpFolderInitializer(Runnable):
 
     @Inject

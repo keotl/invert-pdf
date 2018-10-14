@@ -10,7 +10,7 @@ from jivago.wsgi.request.request import Request
 from jivago.wsgi.request.response import Response
 
 
-@Resource("/")
+@Resource("/convert")
 class FileResource(object):
 
     @Inject
