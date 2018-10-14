@@ -1,3 +1,4 @@
+import logging
 import os
 import subprocess
 import uuid
@@ -26,13 +27,10 @@ class FileResource(object):
         if "HTTP_DPI" in request.headers.keys():
             dpi = int(request.headers["HTTP_DPI"])
 
-        print(f"filename : {filename}")
-        print(f"new_filename : {new_filename}")
-
         with open(filename, 'wb') as f:
             f.write(request.body)
 
-        subprocess.call(f"""convert -density {dpi} -negate "{filename}" "{new_filename}" """.split(" ")[:-1])
+        subprocess.call(f"""convert -density {dpi} -negate {filename} {new_filename} """.split(" ")[:-1])
 
         with open(new_filename, 'rb') as f:
             body = f.read()

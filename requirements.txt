@@ -1,4 +1,5 @@
 croniter==0.3.25
+gunicorn==19.9.0
 Jinja2==2.10
 jivago==0.3.3
 MarkupSafe==1.0
