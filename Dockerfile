@@ -5,6 +5,7 @@ WORKDIR /app
 COPY pdfinvert /app/pdfinvert
 COPY requirements.txt /app
 COPY application.yml /app
+COPY nginx.conf.sigil /app
 RUN apt update && apt install -y python3-pip ghostscript texlive-extra-utils
 
 RUN pip3 install --trusted-host pypi.python.org -r requirements.txt
