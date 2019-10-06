@@ -4,6 +4,6 @@ Jinja2==2.10
 jivago==0.3.4
 MarkupSafe==1.0
 python-dateutil==2.7.3
-PyYAML==3.13
+PyYAML==5.1
 six==1.11.0
 Werkzeug==0.14.1
