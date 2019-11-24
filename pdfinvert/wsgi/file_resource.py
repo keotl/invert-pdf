@@ -20,7 +20,7 @@ class FileResource(object):
     def post_file(self, request: Request) -> Response:
         filename = self.temporary_file_factory.generate_temporary_pdf_filepath()
 
-        dpi = 120
+        dpi = 100
         if "HTTP_DPI" in request.headers.keys():
             dpi = int(request.headers["HTTP_DPI"])
 
