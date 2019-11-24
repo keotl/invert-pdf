@@ -4,7 +4,7 @@ from jivago.jivago_application import JivagoApplication
 
 import pdfinvert.wsgi
 
-application = JivagoApplication(pdfinvert.wsgi)
+application = JivagoApplication(pdfinvert.wsgi, debug=True)
 
 if __name__ == '__main__':
     port = int(os.getenv("PORT", 8080))
