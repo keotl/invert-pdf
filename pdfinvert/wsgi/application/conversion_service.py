@@ -1,8 +1,8 @@
 import subprocess
 from glob import glob
 
+from jivago.inject.annotation import Component
 from jivago.lang.annotations import Inject
-from jivago.lang.registry import Component
 
 from pdfinvert.wsgi.application.temporary_filepath_factory import TemporaryFilePathFactory
 
