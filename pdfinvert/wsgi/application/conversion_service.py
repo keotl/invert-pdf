@@ -1,4 +1,6 @@
 import subprocess
+from glob import glob
+
 from jivago.lang.annotations import Inject
 from jivago.lang.registry import Component
 
@@ -15,9 +17,15 @@ class ConversionService(object):
     def convert(self, filepath: str, dpi: int) -> str:
         flattened_file = self.temporary_file_factory.generate_temporary_pdf_filepath()
 
-        subprocess.check_call(f"""convert -flatten -density {dpi} {filepath} {flattened_file} """.split(" ")[:-1])
+        page_count = int(subprocess.check_output(f"""identify {filepath} | wc -l""", shell=True))
 
         final_file = self.temporary_file_factory.generate_temporary_pdf_filepath()
-        subprocess.check_call(f"""convert -density {dpi} -negate {flattened_file} {final_file} """.split(" ")[:-1])
+
+        subprocess.check_call(f"convert -density {dpi} {filepath} {flattened_file}-%04d.pdf ".split(" ")[:-1])
+        for frame in glob(f"{flattened_file}-*"):
+            subprocess.check_call(f"convert -density {dpi} -flatten {frame} {frame} ".split(" ")[:-1])
+            subprocess.check_call(f"convert -density {dpi} -negate {frame} {frame}.inverted.pdf ".split(" ")[:-1])
+
+        subprocess.check_call(f"convert -density {dpi} {flattened_file}-%04d.pdf.inverted.pdf[0-{page_count - 1}] {final_file} ".split(" ")[:-1])
 
         return final_file
