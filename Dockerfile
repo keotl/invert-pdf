@@ -14,4 +14,4 @@ RUN pip3 install --trusted-host pypi.python.org -r requirements.txt
 
 ENV PYTHONPATH /app
 
-CMD ["/bin/bash", "-c", "gunicorn --bind=0.0.0.0:$PORT --workers=2 --threads=4 --timeout 1800 --graceful-timeout 400 pdfinvert.main"]
+CMD ["/bin/bash", "-c", "gunicorn --bind=0.0.0.0:$PORT --workers=1 --threads=16 --timeout 1800 --graceful-timeout 400 pdfinvert.main"]

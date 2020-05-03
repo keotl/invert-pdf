@@ -1,3 +1,5 @@
 gunicorn==19.9.0
-jivago==0.5.3
+jivago==0.5.5
+prometheus_client==0.7.1
+
 
