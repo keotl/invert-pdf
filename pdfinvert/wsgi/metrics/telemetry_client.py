@@ -17,9 +17,9 @@ class TelemetryClient(object):
     def __init__(self, environment: SystemEnvironmentProperties):
         self.endpoint = environment.get("PROMETHEUS_GATEWAY_ENDPOINT")
         self.registry = CollectorRegistry()
-        self.get_request_counter = Counter("invertpdf_get_request_count", "Number of GET requests",
+        self.get_request_counter = Counter("invertpdf_get_request_count", "Number of sucessful GET requests",
                                            registry=self.registry)
-        self.post_request_counter = Counter("invertpdf_post_request_count", "Number of POST requests",
+        self.post_request_counter = Counter("invertpdf_post_request_count", "Number of successful POST requests",
                                             registry=self.registry)
         self.duration_histogram = Histogram("invertpdf_request_duration_ms", "Request duration",
                                             registry=self.registry,
@@ -33,21 +33,20 @@ class TelemetryClient(object):
                                           registry=self.registry)
         self.logger = logging.getLogger(self.__class__.__name__)
 
-    def track_request_time(self, duration: int):
+    def track_request(self, method: str, duration: int):
         self.logger.info(f"Request took {duration}ms.")
         self.duration_histogram.observe(duration)
-
-    def track_failure_time(self, duration: int):
-        self.track_request_time(duration)
-        self.failure_counter.inc()
-
-    def track_start(self, method: str):
-        self.requests_in_progress.inc()
-        self.get_request_counter.inc()
         if method == "GET":
             self.get_request_counter.inc()
         elif method == "POST":
             self.post_request_counter.inc()
+
+    def track_failure(self, method: str, duration: int):
+        self.failure_counter.inc()
+        self.duration_histogram.observe(duration)
+
+    def track_start(self):
+        self.requests_in_progress.inc()
 
     def track_end(self):
         self.requests_in_progress.dec()

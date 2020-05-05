@@ -20,14 +20,14 @@ class RequestMetricsFilter(Filter):
     @Override
     def doFilter(self, request: Request, response: Response, chain: FilterChain):
         start_time = self._now()
-        self.telemetry_client.track_start(request.method)
+        self.telemetry_client.track_start()
         chain.doFilter(request, response)
 
         if response.status > 400:
             if response.status != 404:  # Ignore random crawlers
-                self.telemetry_client.track_failure_time(self._now() - start_time)
+                self.telemetry_client.track_failure(request.method, self._now() - start_time)
         else:
-            self.telemetry_client.track_request_time(self._now() - start_time)
+            self.telemetry_client.track_request(request.method, self._now() - start_time)
 
         self.telemetry_client.track_end()
 
