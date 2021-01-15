@@ -8,6 +8,8 @@ from jivago.scheduling.annotations import Scheduled, _Interval
 from prometheus_client import Counter, CollectorRegistry, Histogram, Gauge
 from prometheus_client.exposition import push_to_gateway
 
+from pdfinvert.wsgi.application.queueing.conversion_queue import ConversionQueue
+
 
 @Component
 @Singleton
@@ -31,6 +33,9 @@ class TelemetryClient(object):
 
         self.requests_in_progress = Gauge("invertpdf_requests_in_progress", "Number of pending requests",
                                           registry=self.registry)
+        self.queue_depth = Gauge("invertpdf_queue_depth", "Number of pending operations in queue",
+                                 registry=self.registry)
+
         self.logger = logging.getLogger(self.__class__.__name__)
 
     def track_request(self, method: str, duration: int):
@@ -60,13 +65,21 @@ class TelemetryClient(object):
 class TelemetryUploadWorker(Runnable):
 
     @Inject
-    def __init__(self, telemetry_client: TelemetryClient):
+    def __init__(self, telemetry_client: TelemetryClient, conversion_queue: ConversionQueue):
+        self.conversion_queue = conversion_queue
         self.telemetry_client = telemetry_client
         self.logger = logging.getLogger(self.__class__.__name__)
 
     @Override
     def run(self):
+        self.update_queue_metrics()
         try:
             self.telemetry_client.submit()
         except Exception as e:
             self.logger.warning(f"Could not push telemetry data. {e}")
+
+    def update_queue_metrics(self):
+        try:
+            self.telemetry_client.queue_depth.set(self.conversion_queue.get_queue_depth())
+        except Exception as e:
+            self.logger.warning(f"Could not update the queue depth. {e}")

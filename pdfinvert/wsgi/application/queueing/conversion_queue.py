@@ -33,6 +33,9 @@ class JobQueue(abc.ABC):
     def enqueue(self, job: QueuedJob):
         raise NotImplementedError
 
+    def get_queue_depth(self) -> int:
+        raise NotImplementedError
+
 
 class QueuedCommandStatusReporter(abc.ABC):
     def track_completion(self, job_id: str, command_index: int):
@@ -54,6 +57,10 @@ class ConversionQueue(JobQueue, QueuedCommandStatusReporter):
         self.logger = logging.getLogger(self.__class__.__name__)
         self.logger.info(f"Instantiated conversion job queue with address '{id(self)}.'")
         self.executor = ConversionJobExecutor(self, application_properties.get("reserved_threads") or 2)
+
+    @Override
+    def get_queue_depth(self) -> int:
+        return self.queue.qsize()
 
     @Override
     def enqueue(self, job: QueuedJob) -> CompletionToken:

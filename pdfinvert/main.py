@@ -20,6 +20,7 @@ class InvertPdfContext(ProductionJivagoContext):
     def configure_service_locator(self):
         super(InvertPdfContext, self).configure_service_locator()
         self.serviceLocator.bind(JobQueue, ConversionQueue)
+        self.serviceLocator.bind(ConversionQueue, ConversionQueue)
 
     @Override
     def get_default_filters(self) -> List[Union[Filter, Type[Filter]]]:
