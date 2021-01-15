@@ -1,6 +1,6 @@
 import logging
 import subprocess
-from glob import glob
+from datetime import datetime
 from typing import Union
 
 from jivago.config.properties.application_properties import ApplicationProperties
@@ -32,18 +32,37 @@ class ConversionService(object):
 
         final_file = self.temporary_file_factory.generate_temporary_pdf_filepath()
 
-        try:
-            subprocess.check_call(f"convert -density {dpi} {filepath} {flattened_file}-%04d.pdf ".split(" ")[:-1])
-        except Exception as e:
-            self.logger.error(f"Error while splitting PDF file. {e}")
-            raise ConversionException()
+        flatten_commands = []
+        negate_commands = []
+        for i in range(0, page_count):
+            flatten_commands.append(
+                f"convert -density {dpi} -flatten {filepath}[{i}] {flattened_file.strip('.pdf')}-{i:04d}.pdf ".split(
+                    " ")[:-1])
+            negate_commands.append(
+                f"convert -density {dpi} -negate {flattened_file.strip('.pdf')}-{i:04d}.pdf {flattened_file.strip('.pdf')}-{i:04d}.inverted.pdf ".split(
+                    " ")[:-1])
 
-        commands = []
-        for frame in glob(f"{flattened_file}-*"):
-            commands.append(f"convert -density {dpi} -flatten {frame} {frame} ".split(" ")[:-1])
-            commands.append(f"convert -density {dpi} -negate {frame} {frame}.inverted.pdf ".split(" ")[:-1])
+        start = datetime.now()
+        token = self.conversion_queue.enqueue(QueuedJob(final_file + ":flatten", flatten_commands))
+        CompletionTokenAwaiter(token,
+                               on_failure=ConversionException(),
+                               timeout=self.timeout,
+                               on_timeout=ConversionTimeoutException()) \
+            .wait()
+        self.logger.info(f"Completed flattenings in {datetime.now() - start}")
 
-        token = self.conversion_queue.enqueue(QueuedJob(final_file, commands))
+        token = self.conversion_queue.enqueue(QueuedJob(final_file + ":negate", negate_commands))
+        CompletionTokenAwaiter(token,
+                               on_failure=ConversionException(),
+                               timeout=self.timeout,
+                               on_timeout=ConversionTimeoutException()) \
+            .wait()
+        self.logger.info(f"Completed negatings in {datetime.now() - start}")
+        start = datetime.now()
+
+        token = self.conversion_queue.enqueue(QueuedJob(final_file + ":concat", [
+            f"convert -density {dpi} {flattened_file.strip('.pdf')}-%04d.inverted.pdf[0-{page_count - 1}] {final_file} ".split(
+                " ")[:-1]]))
 
         CompletionTokenAwaiter(token,
                                on_failure=ConversionException(),
@@ -51,8 +70,5 @@ class ConversionService(object):
                                on_timeout=ConversionTimeoutException()) \
             .wait()
 
-        subprocess.check_call(
-            f"convert -density {dpi} {flattened_file}-%04d.pdf.inverted.pdf[0-{page_count - 1}] {final_file} ".split(
-                " ")[:-1])
-
+        self.logger.info(f"Completed reassembly in {datetime.now() - start}")
         return final_file
