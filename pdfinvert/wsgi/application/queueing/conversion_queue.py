@@ -81,11 +81,13 @@ class ConversionQueue(JobQueue, QueuedCommandStatusReporter):
                         f"Got command result for an unknown job. This might indicate a process leak in the application!")
                     return
                 if len(completed_steps) == total:
-                    token.get().set_state(JobState.COMPLETED)
                     try:
-                        del self._completion_stages[job_id]
-                    except KeyError:
-                        pass
+                        token.get().set_state(JobState.COMPLETED)
+                    finally:
+                        try:
+                            del self._completion_stages[job_id]
+                        except KeyError:
+                            pass
                 else:
                     token.get().set_state(JobState.RUNNING)
 
@@ -101,11 +103,13 @@ class ConversionQueue(JobQueue, QueuedCommandStatusReporter):
                     self.logger.warning(
                         f"Got command failure for an unknown job. This might indicate a process leak in the application!")
                     return
-                token.get().set_state(JobState.FAILED)
                 try:
-                    del self._completion_stages[job_id]
-                except KeyError:
-                    pass
+                    token.get().set_state(JobState.FAILED)
+                finally:
+                    try:
+                        del self._completion_stages[job_id]
+                    except KeyError:
+                        pass
 
 
 class ConversionJobExecutor(object):

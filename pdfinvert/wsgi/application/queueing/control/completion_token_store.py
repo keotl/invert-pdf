@@ -31,12 +31,6 @@ class CompletionTokenStore(object):
                 .filter(lambda t: t.state in (JobState.RUNNING, JobState.PENDING)) \
                 .toList()
 
-    def update_state(self, job_id: str, state: JobState):
-        for x in self._tokens:
-            if x.job_id == job_id:
-                x.set_state(state)
-                return
-
     def find_by_job(self, job_id: str) -> Nullable[CompletionTokenSource]:
         return Stream(self._tokens) \
             .firstMatch(lambda x: x.job_id == job_id)
