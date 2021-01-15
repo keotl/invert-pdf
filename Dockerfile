@@ -14,4 +14,7 @@ RUN pip3 install -r requirements.txt
 
 ENV PYTHONPATH /app
 
+RUN groupadd -r invert-pdf && useradd --no-log-init -r -g invert-pdf invert-pdf
+USER invert-pdf:invert-pdf
+
 CMD ["/bin/bash", "-c", "gunicorn --bind=0.0.0.0:$PORT --workers=1 --threads=16 --timeout 1800 --graceful-timeout 400 pdfinvert.main"]

@@ -7,7 +7,6 @@ from pdfinvert.wsgi.application.queueing.control.completion_token import JobStat
 from pdfinvert.wsgi.application.queueing.control.completion_token_store import CompletionTokenStore
 from pdfinvert.wsgi.application.queueing.conversion_queue import ConversionQueue
 from pdfinvert.wsgi.application.queueing.queued_job import QueuedJob
-import subprocess
 
 
 class ConversionQueueTests(unittest.TestCase):
@@ -26,3 +25,6 @@ class ConversionQueueTests(unittest.TestCase):
         # time.sleep(1000)
 
         on_completion.assert_called_once()
+
+    def tearDown(self):
+        self.queue.executor.pool.terminate()
