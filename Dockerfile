@@ -10,7 +10,7 @@ COPY requirements.txt /app
 COPY application.yml /app
 COPY nginx.conf.sigil /app
 
-RUN pip3 install --trusted-host pypi.python.org -r requirements.txt
+RUN pip3 install -r requirements.txt
 
 ENV PYTHONPATH /app
 

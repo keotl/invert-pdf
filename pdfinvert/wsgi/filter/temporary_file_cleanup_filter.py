@@ -22,7 +22,6 @@ class TemporaryFileCleanupFilter(Filter):
     @Override
     def doFilter(self, request: Request, response: Response, chain: FilterChain):
         try:
-            self.temporary_file_store.init()
             chain.doFilter(request, response)
         finally:
             files = self.temporary_file_store.get()
@@ -30,4 +29,3 @@ class TemporaryFileCleanupFilter(Filter):
                 .map(lambda f: glob(f"{f}*")) \
                 .flat() \
                 .forEach(os.remove)
-            self.temporary_file_store.clear()

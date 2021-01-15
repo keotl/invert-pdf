@@ -1,24 +1,17 @@
-import threading
 from typing import List
 
-from jivago.inject.annotation import Component, Singleton
+from jivago.inject.annotation import Component, RequestScoped
 
 
 @Component
-@Singleton
+@RequestScoped
 class TemporaryFileStore(object):
 
     def __init__(self):
-        self.content =threading.local()
-
-    def init(self):
-        self.content.files = []
+        self.content = []
 
     def add(self, filename: str):
-        self.content.files.append(filename)
+        self.content.append(filename)
 
-    def get(self)-> List[str]:
-        return self.content.files
-
-    def clear(self):
-        self.content.files = []
+    def get(self) -> List[str]:
+        return self.content

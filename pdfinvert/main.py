@@ -8,12 +8,18 @@ from jivago.lang.annotations import Override
 from jivago.wsgi.filter.filter import Filter
 
 import pdfinvert.wsgi
+from pdfinvert.wsgi.application.queueing.conversion_queue import JobQueue, ConversionQueue
 from pdfinvert.wsgi.filter.request_metrics_filter import RequestMetricsFilter
 from pdfinvert.wsgi.filter.temporary_file_cleanup_filter import TemporaryFileCleanupFilter
 
 
 class InvertPdfContext(ProductionJivagoContext):
     LOGGER = logging.getLogger("InvertPdfContext")
+
+    @Override
+    def configure_service_locator(self):
+        super(InvertPdfContext, self).configure_service_locator()
+        self.serviceLocator.bind(JobQueue, ConversionQueue)
 
     @Override
     def get_default_filters(self) -> List[Union[Filter, Type[Filter]]]:
