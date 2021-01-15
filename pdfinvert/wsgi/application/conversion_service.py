@@ -49,7 +49,7 @@ class ConversionService(object):
                                timeout=self.timeout,
                                on_timeout=ConversionTimeoutException()) \
             .wait()
-        self.logger.info(f"Completed flattenings in {datetime.now() - start}")
+        self.logger.debug(f"Completed flattenings in {datetime.now() - start}")
 
         token = self.conversion_queue.enqueue(QueuedJob(final_file + ":negate", negate_commands))
         CompletionTokenAwaiter(token,
@@ -57,7 +57,7 @@ class ConversionService(object):
                                timeout=self.timeout,
                                on_timeout=ConversionTimeoutException()) \
             .wait()
-        self.logger.info(f"Completed negatings in {datetime.now() - start}")
+        self.logger.debug(f"Completed negatings in {datetime.now() - start}")
         start = datetime.now()
 
         token = self.conversion_queue.enqueue(QueuedJob(final_file + ":concat", [
@@ -70,5 +70,5 @@ class ConversionService(object):
                                on_timeout=ConversionTimeoutException()) \
             .wait()
 
-        self.logger.info(f"Completed reassembly in {datetime.now() - start}")
+        self.logger.debug(f"Completed reassembly in {datetime.now() - start}")
         return final_file
