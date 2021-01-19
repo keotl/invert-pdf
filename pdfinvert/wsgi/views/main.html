@@ -4,36 +4,113 @@
     <meta charset="UTF-8">
     <title>Free PDF Colour Inverter Online</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css" type="text/css" rel="stylesheet"/>
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon"/>
+    <style>
+        .is-primary {
+          border-color: #fe6600 !important;
+          color: #fe6600 !important;
+        }
+        .button.is-primary:hover {
+          background-color: #fe6600 !important;
+          color: white !important;
+        }
+        .button.is-primary:focus {
+          background-color: #fe6600 !important;
+          color: white !important;
+          box-shadow: 0 0 0 0.125em rgba(254,102,0,.25) !important;
+        }
+        #submit-button.is-primary.is-loading::after {
+          border-color: transparent transparent #fe6600 #fe6600 !important;
+        }
+
+    </style>
 </head>
 <body>
-<a href="https://github.com/keotl/pdf-colour-invert"><img style="position: absolute; top: 0; left: 0; border: 0;"
-                                                          src="https://s3.amazonaws.com/github/ribbons/forkme_left_red_aa0000.png"
-                                                          alt="Fork me on GitHub"></a>
-
-<div style="position:absolute; right:0; top: 0;">
-    <a href="/">Invert Colour</a>
-    <a href="/2x2">Convert a PDF to 2x2</a>
+<a href="https://github.com/keotl/pdf-colour-invert"><img
+        style="position: absolute; top: 0; right: 0; border: 0; z-index: 100;"
+        src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"
+        alt="Fork me on GitHub"></a>
+<div class="navbar" role="navigation" aria-label="main navigation">
+    <a class="navbar-item" href="/">Invert Colour</a>
+    <a class="navbar-item" href="/2x2">Convert 2x2</a>
 </div>
 
 <div style="display: flex; flex-direction: row; justify-content: center; margin-top: 20vh;">
     <div>
-        <h1>Free Online PDF Colour Inverter</h1>
+        <img src="/static/logo.png"/>
+        <div style="display: flex; flex-direction: row; justify-content: center;">A free online PDF colour inverter
+        </div>
+        <div style="padding-top: 4rem; display: flex; flex-direction: column; align-items: center;">
 
-        <p>Upload a PDF file to invert its colour</p>
+            <form enctype="multipart/form-data" action="/convert" method="POST">
+                <div style="display: flex; flex-direction: column; align-items: center;">
 
-        <form enctype="multipart/form-data" action="/convert" method="POST">
-            Choose a file to upload: <input name="uploadedfile" type="file"/><br/>
-            <input type="submit" value="Upload File"/>
-        </form>
+                    <div class="field">
+                        <div class="file is-boxed has-name">
+                            <label class="file-label">
+                                <input class="file-input" type="file" name="uploadedfile" id="upload-button" accept=".pdf">
+                                <span class="file-cta">
+        <span class="file-icon">
+          <i class="fas fa-upload"></i>
+        </span>
+        <span class="file-label">
+          Choose File
+        </span>
+      </span>
+                                <span class="file-name" id="file-name">
+      </span>
+                            </label>
+                        </div>
+                    </div>
 
-        <p style="padding-top: 30px">
-            Processing may take several minutes to complete for large files.
-        </p>
+
+                    <div style="margin: 1rem;">
+                        <button type="submit" value="Upload File" id="submit-button" class="button is-outlined is-primary">Upload
+                            File
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <div>
+                <p style="padding-top: 30px">
+                    Processing may take several minutes for large files.
+                </p>
+            </div>
+        </div>
     </div>
+
+</div>
 </div>
 <footer style="position: absolute; bottom: 0; font-size: x-small;">
     <p>Powered by <a href="https://docs.jivago.io">Jivago</a></p>
     <p>Built with &#9829; by <a href="https://github.com/keotl">Kento A. Lauzon</a></p>
 </footer>
+<script>
+    const submitButton = document.getElementById("submit-button");
+    const selectFileButton = document.getElementById("upload-button");
+    const fileNameField = document.getElementById("file-name");
+
+    selectFileButton.addEventListener("change", e => {
+      fileNameField.textContent = e.target.value;
+    })
+
+    submitButton.addEventListener("click", e => {
+      if (selectFileButton.value === "" || selectFileButton.value === undefined) {
+        selectFileButton["data-tooltip"] = "Select a file first.";
+        selectFileButton.className += " has-tooltip-active";
+        e.preventDefault();
+        return false;
+      }
+
+      setTimeout(() => {
+      e.target.disabled = true;
+      e.target.className += " is-loading"
+      }, 100)
+    })
+
+</script>
+
 </body>
 </html>

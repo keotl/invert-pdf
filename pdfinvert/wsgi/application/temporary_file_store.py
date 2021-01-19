@@ -9,7 +9,7 @@ from jivago.inject.annotation import Component, Singleton
 class TemporaryFileStore(object):
 
     def __init__(self):
-        self.content =threading.local()
+        self.content = threading.local()
 
     def init(self):
         self.content.files = []
@@ -17,7 +17,7 @@ class TemporaryFileStore(object):
     def add(self, filename: str):
         self.content.files.append(filename)
 
-    def get(self)-> List[str]:
+    def get(self) -> List[str]:
         return self.content.files
 
     def clear(self):

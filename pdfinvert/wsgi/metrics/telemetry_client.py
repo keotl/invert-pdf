@@ -1,4 +1,5 @@
 import logging
+import os
 
 from jivago.config.properties.system_environment_properties import SystemEnvironmentProperties
 from jivago.inject.annotation import Component, Singleton
@@ -67,6 +68,7 @@ class TelemetryUploadWorker(Runnable):
     @Override
     def run(self):
         try:
-            self.telemetry_client.submit()
+            if os.environ.get("PROMETHEUS_GATEWAY_ENDPOINT"):
+                self.telemetry_client.submit()
         except Exception as e:
             self.logger.warning(f"Could not push telemetry data. {e}")
