@@ -1,1 +1,2 @@
 temp_directory: "/tmp/pdfinvert"
+max_dpi: 300

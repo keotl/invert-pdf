@@ -24,6 +24,8 @@
           border-color: transparent transparent #fe6600 #fe6600 !important;
         }
 
+
+
     </style>
 </head>
 <body>
@@ -43,13 +45,14 @@
         </div>
         <div style="padding-top: 4rem; display: flex; flex-direction: column; align-items: center;">
 
-            <form enctype="multipart/form-data" action="/convert" method="POST">
+            <form enctype="multipart/form-data" action="/convert" method="POST" id="form">
                 <div style="display: flex; flex-direction: column; align-items: center;">
 
                     <div class="field">
                         <div class="file is-boxed has-name">
                             <label class="file-label">
-                                <input class="file-input" type="file" name="uploadedfile" id="upload-button" accept=".pdf">
+                                <input class="file-input" type="file" name="uploadedfile" id="upload-button"
+                                       accept=".pdf">
                                 <span class="file-cta">
         <span class="file-icon">
           <i class="fas fa-upload"></i>
@@ -65,10 +68,28 @@
                     </div>
 
 
-                    <div style="margin: 1rem;">
-                        <button type="submit" value="Upload File" id="submit-button" class="button is-outlined is-primary">Upload
+                    <div style="margin: 1rem;" class="field has-addons">
+                        <p class="control">
+                        <button type="submit" value="Upload File" id="submit-button"
+                                class="button is-outlined is-primary">Upload
                             File
                         </button>
+                        </p>
+                        <p class="control">
+                            <button
+                                    class="button is-outlined is-primary" id="options-button" disabled title="Enable Javascript to use advanced options.">
+                                <i class="fas fa-cog"></i>
+                            </button>
+                        </p>
+
+                        <div class="dropdown is-right" id="options-dropdown">
+                            <div class="dropdown-menu" role="menu">
+                                <div class="dropdown-content" id="dropdown-button-container">
+
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </form>
@@ -82,19 +103,50 @@
     </div>
 
 </div>
-</div>
 <footer style="position: absolute; bottom: 0; font-size: x-small;">
     <p>Powered by <a href="https://docs.jivago.io">Jivago</a></p>
     <p>Built with &#9829; by <a href="https://github.com/keotl">Kento A. Lauzon</a></p>
 </footer>
 <script>
+    const DPI_SETTINGS = [[50, "Low (Fast)"], [100, "Normal"], [125, "High"], [175, "Ultra (Slow)"]]
+
     const submitButton = document.getElementById("submit-button");
     const selectFileButton = document.getElementById("upload-button");
     const fileNameField = document.getElementById("file-name");
+    const optionsButton = document.getElementById("options-button");
+    const optionsDropdown = document.getElementById("options-dropdown");
+    const dropdownButtonContainer = document.getElementById("dropdown-button-container");
+
+    var dpi = 100;
 
     selectFileButton.addEventListener("change", e => {
       fileNameField.textContent = e.target.value;
     })
+
+    optionsButton.disabled = false;
+    optionsButton.title = "Conversion Quality";
+
+    for (const x of DPI_SETTINGS) {
+      const dpiButton = document.createElement("a");
+      dpiButton.textContent = x[1];
+      dpiButton.className = "dropdown-item";
+      dpiButton.onclick = () => {setDpi(x[0]); optionsDropdown.classList.remove("is-active")};
+      dropdownButtonContainer.appendChild(dpiButton);
+    }
+
+    optionsButton.addEventListener("click", e => {
+      e.preventDefault();
+      if (optionsDropdown.classList.contains("is-active")) {
+        optionsDropdown.classList.remove("is-active");
+      } else {
+        optionsDropdown.classList.add("is-active");
+      }
+    })
+
+    function setDpi(x) {
+      dpi = x;
+      document.getElementById("form").action = `/convert?dpi=${dpi}`;
+    }
 
     submitButton.addEventListener("click", e => {
       if (selectFileButton.value === "" || selectFileButton.value === undefined) {
