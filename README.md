@@ -33,5 +33,5 @@ sh run_tests.sh
 ```
 5. Run the application in development mode.
 ```bash
-python main.py
+python pdfinvert/main.py
 ```
