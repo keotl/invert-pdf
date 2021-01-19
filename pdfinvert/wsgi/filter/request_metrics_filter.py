@@ -21,15 +21,16 @@ class RequestMetricsFilter(Filter):
     def doFilter(self, request: Request, response: Response, chain: FilterChain):
         start_time = self._now()
         self.telemetry_client.track_start()
-        chain.doFilter(request, response)
+        try:
+            chain.doFilter(request, response)
 
-        if response.status > 400:
-            if response.status != 404:  # Ignore random crawlers
-                self.telemetry_client.track_failure(request.method, self._now() - start_time)
-        else:
-            self.telemetry_client.track_request(request.method, self._now() - start_time)
-
-        self.telemetry_client.track_end()
+            if response.status > 400:
+                if response.status != 404:  # Ignore random crawlers
+                    self.telemetry_client.track_failure(request.method, self._now() - start_time)
+            else:
+                self.telemetry_client.track_request(request.method, self._now() - start_time)
+        finally:
+            self.telemetry_client.track_end()
 
     def _now(self) -> int:
         return int(time() * 1000)

@@ -18,7 +18,7 @@ class TelemetryClient(object):
     def __init__(self, environment: SystemEnvironmentProperties):
         self.endpoint = environment.get("PROMETHEUS_GATEWAY_ENDPOINT")
         self.registry = CollectorRegistry()
-        self.get_request_counter = Counter("invertpdf_get_request_count", "Number of sucessful GET requests",
+        self.get_request_counter = Counter("invertpdf_get_request_count", "Number of successful GET requests",
                                            registry=self.registry)
         self.post_request_counter = Counter("invertpdf_post_request_count", "Number of successful POST requests",
                                             registry=self.registry)
