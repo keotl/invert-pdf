@@ -3,6 +3,7 @@ import subprocess
 from jivago.inject.annotation import Component
 from jivago.lang.annotations import Inject
 
+from pdfinvert.wsgi.application.temporary_file_store import TemporaryFileStore
 from pdfinvert.wsgi.application.temporary_filepath_factory import TemporaryFilePathFactory
 from pdfinvert.wsgi.exceptions import ConversionException
 
@@ -11,7 +12,8 @@ from pdfinvert.wsgi.exceptions import ConversionException
 class ConversionService(object):
 
     @Inject
-    def __init__(self, temporary_file_factory: TemporaryFilePathFactory):
+    def __init__(self, temporary_file_factory: TemporaryFilePathFactory, temporary_file_store: TemporaryFileStore):
+        self.temporary_file_store = temporary_file_store
         self.temporary_file_factory = temporary_file_factory
 
     def convert(self, filepath: str, dpi: int) -> str:
@@ -24,14 +26,15 @@ class ConversionService(object):
 
         final_file = self.temporary_file_factory.generate_temporary_pdf_filepath()
 
-        subprocess.check_call(f"convert -density {dpi} {filepath} {flattened_file}-%04d.pdf ".split(" ")[:-1])
         for i in range(0, page_count):
             subprocess.check_call(
                 f"convert -density {dpi} -flatten {filepath}[{i}] {flattened_file.strip('.pdf')}-{i:04d}.pdf ".split(
                     " ")[:-1])
+            self.temporary_file_store.add(f"{flattened_file.strip('.pdf')}-{i:04d}.pdf")
             subprocess.check_call(
                 f"convert -density {dpi} -negate {flattened_file.strip('.pdf')}-{i:04d}.pdf {flattened_file.strip('.pdf')}-{i:04d}.inverted.pdf ".split(
                     " ")[:-1])
+            self.temporary_file_store.add(f"{flattened_file.strip('.pdf')}-{i:04d}.inverted.pdf")
 
         subprocess.check_call(
             f"convert -density {dpi} {flattened_file.strip('.pdf')}-%04d.inverted.pdf[0-{page_count - 1}] {final_file} ".split(
