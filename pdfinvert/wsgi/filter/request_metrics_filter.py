@@ -24,11 +24,14 @@ class RequestMetricsFilter(Filter):
         try:
             chain.doFilter(request, response)
 
-            if response.status > 400:
+            if response.status >= 400:
                 if response.status != 404:  # Ignore random crawlers
                     self.telemetry_client.track_failure(request.method, self._now() - start_time)
             else:
                 self.telemetry_client.track_request(request.method, self._now() - start_time)
+        except Exception as e:
+            self.telemetry_client.track_failure(request.method, self._now() - start_time)
+            raise e
         finally:
             self.telemetry_client.track_end()
 

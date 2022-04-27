@@ -33,16 +33,25 @@ class TemporaryFileJanitor(Runnable):
         cutoff = datetime.now() - timedelta(hours=1)
         count = 0
         for folder in glob("/tmp/magick*"):
-            modified = datetime.fromtimestamp(os.path.getmtime(folder))
-            if modified < cutoff:
-                shutil.rmtree(folder, ignore_errors=True)
-                count += 1
+            try:
+                modified = datetime.fromtimestamp(os.path.getmtime(folder))
+                if modified < cutoff:
+                    if os.path.isdir(folder):
+                        shutil.rmtree(folder, ignore_errors=True)
+                    else:
+                        os.remove(folder)
+                    count += 1
+            except:
+                continue
 
         for temp_file in glob(os.path.join(self._temp_dir, "*.pdf")):
-            modified = datetime.fromtimestamp(os.path.getmtime(temp_file))
-            if modified < cutoff:
-                shutil.rmtree(temp_file, ignore_errors=True)
-                count += 1
+            try:
+                modified = datetime.fromtimestamp(os.path.getmtime(temp_file))
+                if modified < cutoff:
+                    os.remove(temp_file)
+                    count += 1
+            except:
+                continue
 
         self._logger.info(f"Removed {count} stray temporary files.")
 
