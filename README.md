@@ -16,7 +16,7 @@ Open [localhost:8080](http://localhost:8080) and enjoy!
 ### Manually from source
 1. Install ImageMagick and ghostscript from your package manager.
 ```bash
-sudo apt install ImageMagick ghostscript
+sudo apt install imagemagick ghostscript
 ```
 2. (Recommended) Use a virtual environment for your python dependencies.
 ```bash
