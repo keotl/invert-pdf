@@ -1,4 +1,4 @@
-FROM amd64/ubuntu:bionic
+FROM amd64/ubuntu:jammy
 
 RUN apt update && apt install -y python3-pip ghostscript texlive-extra-utils imagemagick
 COPY policy.xml /etc/ImageMagick-6/policy.xml
